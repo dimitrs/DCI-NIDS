@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="79">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>Contex.cpp</itemPath>
+      <itemPath>Context.h</itemPath>
+      <itemPath>ContextIP.cpp</itemPath>
+      <itemPath>ContextIP.h</itemPath>
+      <itemPath>ContextStream.cpp</itemPath>
+      <itemPath>ContextStream.h</itemPath>
+      <itemPath>ContextTCP.cpp</itemPath>
+      <itemPath>ContextTCP.h</itemPath>
+      <itemPath>DoIPv4Packet.h</itemPath>
+      <itemPath>DoIPv6Packet.h</itemPath>
+      <itemPath>DoStream.h</itemPath>
+      <itemPath>DoTCPpacket.h</itemPath>
+      <itemPath>DoTCPrules.h</itemPath>
+      <itemPath>HashFunction.cpp</itemPath>
+      <itemPath>HashFunction.h</itemPath>
+      <itemPath>IPaddr.h</itemPath>
+      <itemPath>README</itemPath>
+      <itemPath>Role_IPdecoder.h</itemPath>
+      <itemPath>Role_IPrules.h</itemPath>
+      <itemPath>Role_IPv4decoder.h</itemPath>
+      <itemPath>Role_IPv6decoder.h</itemPath>
+      <itemPath>Role_Rules.h</itemPath>
+      <itemPath>Role_Stream.h</itemPath>
+      <itemPath>Role_StreamCreator.h</itemPath>
+      <itemPath>Role_StreamCreatorImp.h</itemPath>
+      <itemPath>Role_TCPdecoder.h</itemPath>
+      <itemPath>Role_TCPdecoderImp.h</itemPath>
+      <itemPath>Role_TCPrules.h</itemPath>
+      <itemPath>Role_TCPstream.h</itemPath>
+      <itemPath>Streams.cpp</itemPath>
+      <itemPath>Streams.h</itemPath>
+      <itemPath>common.h</itemPath>
+      <itemPath>main.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+      </compileType>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
