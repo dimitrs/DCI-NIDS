@@ -1,22 +1,22 @@
 
 #include "ContextStream.h"
 #include "DoStream.h"
-
+#include "Role_StreamCreatorImp.h"
 
 ContextStream::ContextStream(Role_IPdecoder* ip, Role_TCPdecoder* tcp) : 
-    ip_(ip), tcp_(tcp)//, creator_(tcp)
+    ip_(ip), tcp_(tcp)
 {
+    creator_ = new Role_StreamCreatorImp;
 }
 
 ContextStream::~ContextStream()
 {
+    delete creator_;
 }
 
 void ContextStream::doit()
 {
-    printf("1 llllll %p\n", creator());
     DoStream* stream = creator()->create();
-    printf("2 llllll\n");    
-    //Role_Stream* s = stream;
+    stream_ = stream;
     stream->process();
 }    

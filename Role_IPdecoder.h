@@ -3,6 +3,7 @@
 #define	IPDECODER_H
 
 
+#include "IPaddr.h"
 
 typedef enum {
         TCP_PROTO=0,

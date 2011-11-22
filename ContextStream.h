@@ -29,9 +29,6 @@ private:
     Role_StreamCreator* creator_;
 };
 
-//#define CREATOR \
-//    ((static_cast<ContextStream*> (Context::currentContext_)->creator()))
-
 
 
 #endif	

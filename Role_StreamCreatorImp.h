@@ -14,12 +14,8 @@
 #define TCP \
     ((static_cast<ContextStream*> (Context::currentContext_)->tcp()))
 
-// Used by code within an object role to invoke member functions of the object role self, or this.
-#define SELF \
-    static_cast<const ConcreteDerived*>(this)
 
 /// Implement Snort's Stream5ProcessTcp function
-template <class ConcreteDerived> 
 class Role_StreamCreatorImp : public  Role_StreamCreator
 {
 public:
@@ -32,8 +28,7 @@ private:
        
 };
 
-template <class ConcreteDerived>
-DoStream* const Role_StreamCreatorImp<ConcreteDerived>::create()
+DoStream* const Role_StreamCreatorImp::create()
 {                    
     SessionKey key;
     DoStream* const lwssn = this->getLWSession(&key);
@@ -42,13 +37,10 @@ DoStream* const Role_StreamCreatorImp<ConcreteDerived>::create()
        // policy = (Stream5TcpPolicy *)lwssn->policy;
     }
 
-    //Stream5ProcessTcp(p, lwssn, policy, &key);
     return lwssn;
 }
 
-
-template <class ConcreteDerived> 
-DoStream* const Role_StreamCreatorImp<ConcreteDerived>::getLWSession(SessionKey* const key)
+DoStream* const Role_StreamCreatorImp::getLWSession(SessionKey* const key)
 {
     if (!this->getLWSessionKey(key)) 
     {
@@ -70,10 +62,8 @@ DoStream* const Role_StreamCreatorImp<ConcreteDerived>::getLWSession(SessionKey*
     }
     return stream;
 }
-
         
-template <class ConcreteDerived> 
-int Role_StreamCreatorImp<ConcreteDerived>::getLWSessionKey(SessionKey* const key)
+int Role_StreamCreatorImp::getLWSessionKey(SessionKey* const key)
 {    
     /* Because the key is going to be used for hash lookups,
      * the lower of the values of the IP address field is
@@ -128,9 +118,7 @@ int Role_StreamCreatorImp<ConcreteDerived>::getLWSessionKey(SessionKey* const ke
     return 1;
 }
 
-
-template <class ConcreteDerived> 
-DoStream* const Role_StreamCreatorImp<ConcreteDerived>::newLWSession(const SessionKey& key)
+DoStream* const Role_StreamCreatorImp::newLWSession(const SessionKey& key)
 {
     DoStream* stream = new DoStream;
     

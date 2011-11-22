@@ -1,6 +1,8 @@
 
-#ifndef DO_TCPSTREAM_H
-#define	DO_TCPSTREAM_H
+#ifndef DO_STREAM_H
+#define	DO_STREAM_H
+
+#include "common.h"
 
 
 #define STREAM5_STATE_NONE                  0x0000
@@ -20,15 +22,42 @@
 #define STREAM5_STATE_RECEIVER_SEEN         0x2000
 #define STREAM5_STATE_CLOSED                0x4000
 
+#define SSNFLAG_TIMEDOUT                    0x00010000
 
 #include "Role_TCPstream.h"
 
-/// Stream Data
-class DoStream : public Role_TCPstream<DoStream> 
+struct SessionKey
+{
+    SessionKey() :
+        port_l(0),
+        port_h(0),
+        vlan_tag(0),
+        protocol(0),
+        pad(0)
+    {
+        memset(ip_l, 0, sizeof(uint32_t)*4);
+        memset(ip_h, 0, sizeof(uint32_t)*4);
+    }
+        
+    uint32_t   ip_l[4]; /* Low IP */
+    uint32_t   ip_h[4]; /* High IP */
+    uint16_t   port_l; /* Low Port - 0 if ICMP */
+    uint16_t   port_h; /* High Port - 0 if ICMP */
+    uint16_t   vlan_tag;
+    char       protocol;
+    char       pad;
+};
+
+
+
+
+class DoStream : 
+    public Role_TCPstream<DoStream>
+    // public Role_UDPstream<DoStream>
+    
 {
  public:
     DoStream() :
-        last_data_seen_(0),
         last_data_seen_(0),
         expire_time_(0),
         session_flags_(0),
@@ -42,7 +71,7 @@ class DoStream : public Role_TCPstream<DoStream>
         ignore_direction_(0)
     {}
     
-    inline void key(SessionKey p) { key_ = key; }
+    inline void key(SessionKey p) { key_ = p; }
     inline const SessionKey& key() const { return key_; }    
 
     inline void last_data_seen(long p) { last_data_seen_ = p; }
@@ -63,9 +92,6 @@ class DoStream : public Role_TCPstream<DoStream>
     inline void server_port(uint16_t p) { server_port_ = p; }
     inline uint16_t server_port() const { return server_port_; }    
     
-    inline void server_port(uint16_t p) { server_port_ = p; }
-    inline uint16_t server_port() const { return server_port_; }    
-
     inline void ipprotocol(uint16_t p) { ipprotocol_ = p; }
     inline uint16_t ipprotocol() const { return ipprotocol_; }    
     

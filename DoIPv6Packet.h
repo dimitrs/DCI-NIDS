@@ -1,12 +1,14 @@
 #ifndef IPV6PACKET_H
 #define	IPV6PACKET_H
 
-#include <netinet/ip.h>
-
+#include "common.h"
 #include "Role_IPv6decoder.h"
 #include "Role_IPrules.h"
 
-class DoIPv6Packet : public Role_IPv6decoder<DoIPv6Packet>, public Role_IPrules<DoIPv6Packet>
+class DoIPv6Packet : 
+    // These are the possible roles an IP packet can take on: 
+    public Role_IPv6decoder<DoIPv6Packet>, 
+    public Role_IPrules<DoIPv6Packet>
 {
     
 public:
@@ -41,9 +43,13 @@ public:
     inline uint32_t id(uint32_t p) { id_ = p; }
     inline uint32_t id() const { return id_; }  
     
+    inline void totallength(uint32_t p) { tot_len_ = p; }
+    inline uint32_t totallength() const { return tot_len_; }    
+    
+    inline void data(const void* d) { packet_=d; }           
     inline const uint8_t* data() const { return static_cast<const uint8_t*>(packet_); }   
     
-    inline time(uint64_t sec);
+    inline void time(uint64_t sec);
     inline uint64_t time() const { return time_; }    
     
         
@@ -64,6 +70,8 @@ protected:
     
     /// Total header length in bytes
     uint32_t headerLength_;
+    /// Pkt length
+    uint32_t tot_len_;    
     /// number of extensions in this packet
     uint8_t ip6_extension_count_;  
     /// flag to indicate a fragmented packet 

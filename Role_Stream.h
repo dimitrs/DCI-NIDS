@@ -1,13 +1,13 @@
 
-#ifndef STREAM_H
-#define	STREAM_H
+#ifndef ROLESTREAM_H
+#define	ROLESTREAM_H
 
 
 class Role_Stream
 {
 public:
     
-    virtual void accept(const void* pkt) = 0;
+    virtual void process() = 0;
    
 };
 

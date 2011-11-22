@@ -1,5 +1,6 @@
 
 #include "Streams.h"
+#include "DoStream.h"
 
 Streams *Streams::inst_ = 0;
 

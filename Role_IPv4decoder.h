@@ -2,10 +2,11 @@
 #ifndef IPV4DECODER_H
 #define	IPV4DECODER_H
 
-#include "Role_IPdecoder.h"
 #include "ContextTCP.h"
-#include "DoTCPpacket.h"
-#include "DoTCPrules.h"
+
+
+#define RULES \
+    ((static_cast<ContextIP*> (Context::currentContext_)->rules()))
 
 
 // Used by code within an object role to invoke member functions of the object role self, or this.
@@ -19,7 +20,6 @@ class Role_IPv4decoder : public Role_IPdecoder
 public:
      Role_IPv4decoder() {}
      virtual ~Role_IPv4decoder() {}
-
 
     /// IPv6 Next Header / IPv4 Protocol field
     PROTO getProto() const;
@@ -50,8 +50,8 @@ public:
     
     /// Packet arrival time
     u_int64_t getTime() const;    
-    
-    void accept(const void* const pkt);
+
+    void accept(const void* pkt);
       
 private:
     static const short IP_OFFSET=0x1fff;
@@ -59,18 +59,42 @@ private:
     
 };
 
+
+
 template <class ConcreteDerived>
-void Role_IPv4decoder<ConcreteDerived>::accept(const void* const packet)
+void Role_IPv4decoder<ConcreteDerived>::accept(const void* packet)
 {
-    SELF->ip(static_cast<const iphdr *>(packet));
-    SELF->srcip()->setAddr(SELF->ip()->saddr);
-    SELF->dstip()->setAddr(SELF->ip()->daddr); 
+    const iphdr* ip = static_cast<const iphdr*>(packet);
+    
+    SELF->data(packet);
+    
+    SELF->srcip()->setAddr(ip->saddr);
+    SELF->dstip()->setAddr(ip->daddr); 
         
+    if (ip->protocol==6)
+    {
+        SELF->proto(TCP_PROTO);
+    }
+    else if (ip->protocol==17)
+    {
+        SELF->proto(UDP_PROTO);        
+    }
+    else {
+        SELF->proto(UNKNOWN_PROTO);                
+    }
+    
+    SELF->totallength(ntohs(ip->tot_len));
+    SELF->headerLength(ip->ihl*4);
+    SELF->id(ntohs(ip->id));
+    SELF->frag_flag(ntohs(ip->frag_off) & 0x3fff);
+    SELF->frag_offset(ntohs(ip->frag_off));
+    
+    // Apply IP header rules
+    RULES->match();
+                    
     if (Role_IPv4decoder<ConcreteDerived>::getProto() == TCP_PROTO)
     {
-        DoTCPrules rules;
-        DoTCPpacket tcp(packet);
-        ContextTCP context(SELF, &tcp, &rules, packet);
+        ContextTCP context(SELF, packet);
         context.doit();       
     }
 }
@@ -78,27 +102,19 @@ void Role_IPv4decoder<ConcreteDerived>::accept(const void* const packet)
 template <class ConcreteDerived>
 PROTO Role_IPv4decoder<ConcreteDerived>::getProto() const
 {
-    if (SELF->ip()->protocol==6)
-    {
-         return TCP_PROTO;
-    }
-    else if (SELF->ip()->protocol==17)
-    {
-         return UDP_PROTO;
-    }
-    return UNKNOWN_PROTO;
+    return SELF->proto();
 }
 
 template <class ConcreteDerived>
 u_int32_t Role_IPv4decoder<ConcreteDerived>::getIPpktLength() const
 {
-    return ntohs(SELF->ip()->tot_len);
+    return SELF->totallength();
 }
 
 template <class ConcreteDerived>
 u_int16_t Role_IPv4decoder<ConcreteDerived>::getIPhdrLength() const
 {
-    return SELF->ip()->ihl*4;
+    return SELF->headerLength();
 }
 
 template <class ConcreteDerived>
@@ -110,56 +126,55 @@ u_int32_t Role_IPv4decoder<ConcreteDerived>::getIPpayloadLength() const
 template <class ConcreteDerived>
 u_int16_t Role_IPv4decoder<ConcreteDerived>::getID() const
 {
-    return ntohs(SELF->ip()->id);
+    return SELF->id();
 }
 
 template <class ConcreteDerived>
 bool Role_IPv4decoder<ConcreteDerived>::isFragment() const
 {
-    return ntohs(SELF->ip()->frag_off) & 0x3fff;
+    return SELF->frag_flag();
 }
 
 template <class ConcreteDerived>
 bool Role_IPv4decoder<ConcreteDerived>::isInitialFragment() const
 {
-    // 32 is 0x00 in nework byte format
-    if (SELF->ip()->frag_off==32)
-    {
+    if (!SELF->frag_flag()) return false;
+    
+    if (SELF->frag_offset()) {
+        return false;
+    }
+    else {
         return true;
     }
-    return false;
 }
 
 template <class ConcreteDerived>
 bool Role_IPv4decoder<ConcreteDerived>::isFinalFragment() const
 {
-    uint16_t offset = ntohs(SELF->ip()->frag_off);
-    return (((offset & ~Role_IPv4decoder::IP_OFFSET) & IP_MF) == 0);
+    if (!SELF->frag_flag()) return false;
+    return (((SELF->frag_offset() & ~IP_OFFSET) & IP_MF) == 0);    
 }
 
 template <class ConcreteDerived>
 u_int32_t Role_IPv4decoder<ConcreteDerived>::getFragmentOffset() const
 {    
-    int offset = ntohs(SELF->ip()->frag_off);
-    offset &= Role_IPv4decoder::IP_OFFSET;
-    offset <<= 3;  // offset is in 8-byte chunks
-    return offset;
+    return SELF->frag_offset();
 }
 
 template <class ConcreteDerived>
 const uint8_t* Role_IPv4decoder<ConcreteDerived>::getIPpayload() const
 {
-    return SELF->data() + getIPhdrLength();    
+    return SELF->data() + SELF->headerLength();    
 }
 
 template <class ConcreteDerived>
-IPaddr* const Role_IPv4decoder<ConcreteDerived>::srcip() const
+IPaddr* const Role_IPv4decoder<ConcreteDerived>::srcip() 
 {
     return SELF->srcip();    
 }
 
 template <class ConcreteDerived>
-IPaddr* const Role_IPv4decoder<ConcreteDerived>::dstip() const
+IPaddr* const Role_IPv4decoder<ConcreteDerived>::dstip() 
 {
     return SELF->dstip();    
 }

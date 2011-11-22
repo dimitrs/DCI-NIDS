@@ -2,10 +2,21 @@
 #ifndef TCPRULES_H
 #define	TCPRULES_H
 
+#include "common.h"
 
+enum RULE_NAMES {
+    DECODE_TCP_NMAP_XMAS = 0,
+    DECODE_DOS_NAPTHA,
+    DECODE_SYN_TO_MULTICAST                
+};
 
-#include "Role_Rules.h"
-#include "ContextTCP.h"
+// Will find whatever object is currently playing the IP object role
+#define IP \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->ip()))
+
+// Will find whatever object is currently playing the TCP object roles
+#define TCP \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->tcp()))
 
 // Used by code within an object role to invoke member functions of the object role self, or this.
 #define SELF \
@@ -18,7 +29,7 @@ class Role_TCPrules : public Role_Rules
 {
 public:
    /// See if there are any rules that match 
-   void accept(const void* pkt);
+   void match();
       
 private:
 };
@@ -26,7 +37,7 @@ private:
 
 
 template <class ConcreteDerived> 
-void Role_TCPrules<ConcreteDerived>::accept(const void* pkt)
+void Role_TCPrules<ConcreteDerived>::match()
 {
     if (SELF->hasRule(DECODE_TCP_NMAP_XMAS) || SELF->hasRule(DECODE_TCP_NMAP_XMAS))
     {

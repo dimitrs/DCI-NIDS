@@ -15,16 +15,9 @@ class Context
 {
     
 public:
-    Context()
-    {
-        parentContext_ = currentContext_;
-        currentContext_ = this;
-    }
+    Context();
     
-    virtual ~Context()
-    {
-        currentContext_ = parentContext_;
-    }
+    virtual ~Context();
     
     virtual void doit() = 0;
         
@@ -37,7 +30,7 @@ public:
     
 };
 
-Context* Context::currentContext_ = NULL;
+
 
 #endif	/* CONTEXT_H */
 

@@ -7,7 +7,7 @@ class Role_Rules
 {
 public:
     
-    virtual void accept(const void* pkt) = 0;
+    virtual void match() = 0;
    
 };
 

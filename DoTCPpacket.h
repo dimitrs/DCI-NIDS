@@ -2,9 +2,13 @@
 #ifndef TCPPACKET_H
 #define	TCPPACKET_H
 
+
 #include "Role_TCPdecoderImp.h"
 
-class DoTCPpacket : public Role_TCPdecoderImpl<DoTCPpacket> 
+
+class DoTCPpacket : 
+    public Role_TCPdecoderImpl<DoTCPpacket>
+
 {
  public:
     DoTCPpacket(const void*  packet) : 

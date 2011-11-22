@@ -2,18 +2,35 @@
 #ifndef TCPDECODERIMP_H
 #define	TCPDECODERIMP_H
 
-#include <netinet/tcp.h>
+#include "common.h"
+#include "ContextStream.h"
 
-#include "Role_TCPdecoder.h"
-#include "ContextIP.h"
+#  define TH_FIN	0x01
+#  define TH_SYN	0x02
+#  define TH_RST	0x04
+#  define TH_PUSH	0x08
+#  define TH_ACK	0x10
+#  define TH_URG	0x20
 
 
+// Will find whatever object is currently playing the IP object role
+#define IP \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->ip()))
 
+#define TCP \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->tcp()))
 
+#define TCP_RULES \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->rules()))
+
+#define STREAM \
+    ((static_cast<ContextTCP*> (Context::currentContext_)->stream()))
 
 // Used by code within an object role to invoke member functions of the object role self, or this.
 #define SELF \
     static_cast<const ConcreteDerived*>(this)
+
+
 
 ///  Decode the TCP transport layer. 
 template <class ConcreteDerived> 
@@ -30,7 +47,7 @@ public:
     inline bool isPush() const { return SELF->tcp()->th_flags | TH_PUSH; }
     
     inline u_char flags() const { return SELF->tcp()->th_flags; }
-    inline tcp_seq seq() const { return SELF->tcp()->th_seq; }    
+    inline u_int32_t seq() const { return SELF->tcp()->th_seq; }    
     inline u_int8_t offset() const { return (SELF->tcp()->th_off & 0xf0) >> 4; }        
     
     inline const uint8_t* getL4Payload() const { return SELF->data(); }   
@@ -39,7 +56,6 @@ public:
     inline u_int16_t getDstPort() const { return ntohs(SELF->tcp()->th_dport); }
     
    
-
 private:
    
     static const short TCP_HEADER_LEN=20;
@@ -51,10 +67,8 @@ void Role_TCPdecoderImpl<ConcreteDerived>::accept(const void* const packet)
 {
     // lay TCP on top of the data 
     SELF->tcp((tcphdr *)(IP->getIPpayload()));
+    SELF->hlen(SELF->tcp()->th_off << 2);
 
-    // multiply the payload offset value by 4 
-    SELF->hlen(this->offset() << 2);
-    
     uint32_t hlen = SELF->hlen();
 
     if(hlen < Role_TCPdecoderImpl::TCP_HEADER_LEN)
@@ -64,7 +78,7 @@ void Role_TCPdecoderImpl<ConcreteDerived>::accept(const void* const packet)
     }
 
     // if options are present, decode them 
-    SELF->tcp_options_len((uint16_t)(hlen - TCP_HEADER_LEN));
+    SELF->tcp_options_len(hlen - TCP_HEADER_LEN);
 
     if(SELF->tcp_options_len() > 0)
     {
@@ -83,10 +97,21 @@ void Role_TCPdecoderImpl<ConcreteDerived>::accept(const void* const packet)
     SELF->dsize(IP->getIPpktLength() - IP->getIPhdrLength() - hlen);
     
     // Apply TCP header rules  
-    RULES->accept(packet);
+    TCP_RULES->match();
     
-    STREAM->accept(packet);    
-       
+    // Retrieve the associated stream
+    if (SELF->isSyn() || !SELF->isAck())
+    {
+        // SYN only 
+        ContextStream stream(IP, TCP);
+        stream.doit();
+    }
+    else
+    {
+        // Do nothing with this packet since we require a 3-way.
+        // Wow that just sounds cool... Require a 3-way.  Hehe.
+        return;
+    }
 }
 
 #endif	/* TCPDECODERIMP_H */

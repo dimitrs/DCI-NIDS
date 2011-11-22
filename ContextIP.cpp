@@ -1,9 +1,7 @@
 
 #include "ContextIP.h"
-#include "DoIPv6Packet.h"
-#include "Role_IPv6decoder.h"
 #include "DoIPv4Packet.h"
-#include "Role_IPv4decoder.h"
+#include "DoIPv6Packet.h"
 
 ContextIP::ContextIP(Role_IPdecoder* decode, Role_Rules* rules, const void* pkt) : 
     decode_(decode), rules_(rules), pkt_(pkt)

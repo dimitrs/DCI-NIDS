@@ -2,20 +2,22 @@
 #ifndef CONTEXTIP_H
 #define	CONTEXTIP_H
 
-#include "Context.h"
 
-class Role_IPdecoder;
-class Role_Rules;
+#include "Context.h"
+#include "Role_IPdecoder.h"
+#include "Role_Rules.h" 
 
 
 /// Use case: IP pkt
 class ContextIP : public Context
 {
 public:
-    ContextIP(Role_IPdecoder* decode, Role_Rules* rules, const void* pkt) : 
-        decode_(decode), rules_(rules), pkt_(pkt)
-    {}
+    ContextIP(Role_IPdecoder* decode, Role_Rules* rules, const void* pkt);
+
+    ContextIP(const void* pkt);
     
+    virtual ~ContextIP();    
+        
     void doit()
     {
        decode()->accept(pkt_);
@@ -31,11 +33,6 @@ private:
     Role_Rules* rules_;      
     const void* pkt_;    
 };
-
-
-// Will find whatever object is currently playing the IP object role
-#define IP \
-    ((static_cast<ContextIP*> (Context::currentContext_)->decode()))
 
 
 #endif	/* CONTEXTIP_H */

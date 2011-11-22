@@ -2,11 +2,8 @@
 #ifndef IPADDR_H
 #define	IPADDR_H
 
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-#include <netinet/ip.h>
-#include <netinet/ip6.h>
-#include <arpa/inet.h>
+#include "common.h"
+
 
 /// Represents a IPv4 or IPv6 internet address.
 struct IPaddr
@@ -29,9 +26,9 @@ struct IPaddr
         addr_.s6_addr32[3] = addr.s6_addr32[3];
     }
     
-    const u_int32_t const* getAddr() const 
+    const u_int32_t* getAddr() const 
     {
-        return &addr_.s6_addr32;
+        return &addr_.s6_addr32[0];
     }
 
     /// Compare two addresses for equality.
@@ -39,7 +36,7 @@ struct IPaddr
     {
         if (isIPv4_)
         {
-            return addr_[0] == addr.addr_[0];
+            return addr_.s6_addr32[0] == addr.addr_.s6_addr32[0];            
         }
         else
         {
@@ -61,7 +58,7 @@ struct IPaddr
     {
         if (isIPv4_)
         {
-            return addr_[0] != addr.addr_[0];
+            return addr_.s6_addr32[0] != addr.addr_.s6_addr32[0];            
         }
         else
         {
@@ -82,7 +79,7 @@ struct IPaddr
     {
         if (isIPv4_)
         {
-            return addr_[0] < addr.addr_[0];            
+            return addr_.s6_addr32[0] < addr.addr_.s6_addr32[0];                        
         }
         else
         {

@@ -1,10 +1,8 @@
 
-#include "ContextIP.h"
+
+#include "ContextTCP.h"
 #include "DoTCPpacket.h"
 #include "DoTCPrules.h"
-#include "Role_IPv6decoder.h"
-#include "DoIPv4Packet.h"
-#include "Role_IPv4decoder.h"
 
 ContextTCP::ContextTCP(Role_IPdecoder* ip, const void* pkt) : 
     ip_(ip), tcp_(NULL), rules_(NULL), pkt_(pkt)
@@ -13,13 +11,15 @@ ContextTCP::ContextTCP(Role_IPdecoder* ip, const void* pkt) :
     tcp_ = obj; 
     
     DoTCPrules* r = new DoTCPrules;        
-    rules_ = r;    
+    rules_ = r;        
 }
 
 ContextTCP::~ContextTCP()
 {
     if (tcp_) delete tcp_;
     tcp_=NULL;    
+    if (rules_) delete rules_;
+    rules_=NULL;        
 }
 
 void ContextTCP::doit()
