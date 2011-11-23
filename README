@@ -1,0 +1,7 @@
+
+
+See http://dimitri-christodoulou.blogspot.com/search/label/DCI for details.
+
+An experimental network protocol analyzer implementation (in C++) based on the 
+Data, context and interaction (DCI) paradigm and code snippets from Snort.
+
